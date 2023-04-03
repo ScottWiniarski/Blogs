@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 // Connection info stored in appsettings.json
 IConfiguration configuration = new ConfigurationBuilder()
@@ -10,9 +11,14 @@ builder.Services.AddControllersWithViews();
 // Register the DataContext service
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(configuration["Data:Blog:ConnectionString"]));
 var app = builder.Build();
+builder.Services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(configuration["Data:AppIdentity:ConnectionString"]));
+builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<AppIdentityDbContext>().AddDefaultTokenProviders();
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
